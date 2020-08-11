@@ -32,11 +32,4 @@ const router = new Router({
   }
 })
 
-var link = document.querySelector("link[rel*='icon']") || document.createElement('link')
-router.beforeEach((to, from, next) => {
-  document.title = '百悦商城'
-  link.href = 'http://jc.cmall.world/favicon.ico'
-  document.getElementsByTagName('head')[0].appendChild(link)
-  next()
-})
 export default router

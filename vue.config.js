@@ -57,7 +57,6 @@ module.exports = {
       config.externals(externals)
       const cdn = {
         css: [
-          'https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/css/swiper.min.css',
           'https://cdn.jsdelivr.net/npm/vant@2.2.1/lib/index.css'
         ],
         js: [
