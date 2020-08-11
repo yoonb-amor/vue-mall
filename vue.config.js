@@ -83,6 +83,7 @@ module.exports = {
           args[0].minify.removeComments = false
           return args
         })
+
     }
     // 开启多线程打包
     config.module
