@@ -6,7 +6,6 @@
       </span>
       <i>选择地址</i>
     </cm-header>
-
     <ul v-if="addressArray.length === 0" class="address-no">
       <img src="../../assets/image/mime/no-address.png" />
       <li class="address-text">
@@ -19,49 +18,32 @@
       class="address-card"
       v-for="(address, index) in addressArray"
       :key="index"
-      @click="handleChooseAddress(address.userAddrId)"
+      @click="handleChooseAddress(address.addressId)"
     >
       <ul class="card-content">
-        <div class="card-triangle" :class="{'active':address.defaultFlag}"></div>
-        <li class="addres-svg">
-          <svg-icon
-            :class="{'active':address.defaultFlag}"
-            icon-class="address-home"
-            v-if="address.tag === '家'"
-          ></svg-icon>
-          <svg-icon
-            :class="{'active':address.defaultFlag}"
-            icon-class="address-company"
-            v-if="address.tag === '公司'"
-          ></svg-icon>
-          <svg-icon
-            :class="{'active':address.defaultFlag}"
-            icon-class="address-school"
-            v-if="address.tag === '学校'"
-          ></svg-icon>
-        </li>
+        <div class="card-triangle" :class="{'active':address.beDefault=='0'}"></div>
         <li class="card-info">
           <div class="info-name">
-            <span>{{address.receiverName}}</span>
-            <i>{{address.tag}}</i>
+            <span>{{address.consignee}}</span>
           </div>
           <div class="info-address">
-            <span>{{address.fullAddress}}</span>
+            <span>{{address.allAreaName}}-{{address.streetAddress}}</span>
             <van-icon name="arrow" color="#EC3924" />
           </div>
-          <span>{{address.receiverPhone}}</span>
+          <span>{{address.phone}}</span>
         </li>
       </ul>
     </section>
     <div class="address-btn">
-      <router-link to="/mine/addAddress">
-        <van-button plain type="danger" icon="plus" size="large">新增地址</van-button>
-      </router-link>
+        <van-button @click="addAddress" plain type="danger" icon="plus" size="large">新增地址</van-button>
     </div>
   </div>
 </template>
 
 <script>
+import fetch from '../../lib/fetch'
+import qs from 'qs'
+
 export default {
   name: 'ChooseAddress',
   data () {
@@ -74,17 +56,34 @@ export default {
     this.getUserList()
   },
   methods: {
-    handleChooseAddress (userAddrId) {
-      let skuInfoForm = {}
-      if (this.$route.query.skuId) {
-        skuInfoForm = {
-          quantity: this.$route.query.quantity,
-          skuId: this.$route.query.skuId
+    addAddress(){
+      this.$router.push({
+        path: `/mine/addAddress`,
+        query: {
+          pageFrom: 1,
+          programId:this.$route.query.programId,
         }
+      })
+    },
+    handleChooseAddress (addressId) {
+      let skuInfoForm = {}
+      //从购买页进来
+      if (this.$route.query.programId) {
+        skuInfoForm = {
+          addressId: addressId,
+          programId: this.$route.query.programId
+        }
+        this.$router.push({
+          path: `/order/confirmOrder`,
+          query: {
+            addressId: addressId,
+            programId: this.$route.query.programId
+          }
+        })
       } else {
         skuInfoForm = null
       }
-      this.$http
+      /*this.$http
         .post(`/api/order/checkout`, {
           skuInfoForm: skuInfoForm,
           // skuInfoForm: {
@@ -104,13 +103,19 @@ export default {
               userAddrId: userAddrId
             }
           })
-        })
+        })*/
     },
-    getUserList () {
-      // 获取用户列表
-      this.$http.get(`/api/address/getUserAddrList`).then(response => {
-        this.addressArray = response.data.content
-      })
+    async getUserList () {
+      let params = { userPhone: userPhone,accessToken:accessToken }
+      const res = await fetch(`/page/exchange/list`, qs.stringify(params))
+      if(!(res.code=="0000")){
+        this.$toast({
+          mask: false,
+          message: res.message
+        })
+        return
+      }
+      this.addressArray=res.data;
     }
   }
 }

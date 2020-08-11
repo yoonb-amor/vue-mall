@@ -18,7 +18,7 @@
         style="z-index: 100;"
       >
         <van-tabbar-item name="index" to="/index">
-          <span>首页</span>
+          <span slot-scope="props" :class="props.active ? item_text_active : item_text">首页</span>
           <img
             slot="icon"
             slot-scope="props"
@@ -26,7 +26,7 @@
           />
         </van-tabbar-item>
         <van-tabbar-item name="mine" to="/mine">
-          <span>我</span>
+          <span slot-scope="props" :class="props.active ? item_text_active : item_text">我</span>
           <img
             slot="icon"
             slot-scope="props"
@@ -44,18 +44,20 @@ export default {
   name: 'tabbar',
   data () {
     return {
+      item_text:"van-tabbar-item-text",
+      item_text_active:"van-tabbar-item-text-active",
       icon_home: {
         normal: require('@/assets/icons/tabbar/home.png'),
-        active: require('@/assets/icons/tabbar/home_active.png')
+        active: require('@/assets/icons/tabbar/home-active.png')
       },
       icon_classify: {
         normal: require('@/assets/icons/tabbar/classify.png'),
         active: require('@/assets/icons/tabbar/classify_active.png')
       },
-      icon_cart: {
+      /*icon_cart: {
         normal: require('@/assets/icons/tabbar/cart.png'),
         active: require('@/assets/icons/tabbar/cart_active.png')
-      },
+      },*/
       icon_mine: {
         normal: require('@/assets/icons/tabbar/mine.png'),
         active: require('@/assets/icons/tabbar/mine_active.png')
@@ -88,6 +90,16 @@ export default {
 .tabbar {
   ul {
     height: 50px;
+    .van-tabbar-item{
+      background: #ff3048;
+      .van-tabbar-item-text{
+        color: #cdcdcd;
+      }
+      .van-tabbar-item-text-active{
+        color: #ffffff;
+      }
+
+    }
   }
 }
 </style>

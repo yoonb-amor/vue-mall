@@ -1,7 +1,7 @@
 <template>
   <div class="shipping-address">
      <cm-header>
-      <span slot="left" @click="$router.go(-1)">
+      <span slot="left" @click="$router.push('/mine')">
         <svg-icon icon-class="white-btn"></svg-icon>
       </span>
       <i>收货地址</i>
@@ -18,49 +18,32 @@
       class="address-card"
       v-for="(address, index) in addressArray"
       :key="index"
-      @click="handleGoToEditAddrss(address)"
+      @click="handleGoToEditAddrss(address.addressId)"
     >
       <ul class="card-content">
-        <div class="card-triangle" :class="{'active':address.defaultFlag}"></div>
-        <li class="addres-svg">
-          <svg-icon
-            :class="{'active':address.defaultFlag}"
-            icon-class="address-home"
-            v-if="address.tag === '家'"
-          ></svg-icon>
-          <svg-icon
-            :class="{'active':address.defaultFlag}"
-            icon-class="address-company"
-            v-if="address.tag === '公司'"
-          ></svg-icon>
-          <svg-icon
-            :class="{'active':address.defaultFlag}"
-            icon-class="address-school"
-            v-if="address.tag === '学校'"
-          ></svg-icon>
-        </li>
+        <div class="card-triangle" :class="{'active':address.beDefault=='0'}"></div>
         <li class="card-info">
           <div class="info-name">
-            <span>{{address.receiverName}}</span>
-            <i>{{address.tag}}</i>
+            <span>{{address.consignee}}</span>
           </div>
           <div class="info-address">
-            <span>{{address.fullAddress}}</span>
+            <span>{{address.allAreaName}}-{{address.streetAddress}}</span>
             <van-icon name="arrow" color="#EC3924" />
           </div>
-          <span>{{address.receiverPhone}}</span>
+          <span>{{address.phone}}</span>
         </li>
       </ul>
     </section>
     <div class="address-btn">
-      <router-link to="/mine/addAddress">
-        <van-button plain type="danger" icon="plus" size="large">新增地址</van-button>
-      </router-link>
+      <van-button @click="addAddress" plain type="danger" icon="plus" size="large">新增地址</van-button>
     </div>
   </div>
 </template>
 
 <script>
+import fetch from '../../lib/fetch'
+import qs from 'qs'
+
 export default {
   name: 'ShippingAddress',
   data () {
@@ -72,17 +55,31 @@ export default {
     this.getUserList()
   },
   methods: {
+    addAddress(){
+      this.$router.push({
+        path: `/mine/addAddress`,
+        query: {
+          pageFrom: 2,
+        }
+      })
+    },
     handleGoToEditAddrss (address) {
       this.$router.push({
         path: '/mine/editAddress',
         query: Object.assign({}, address)
       })
     },
-    getUserList () {
-      // 获取用户列表
-      this.$http.get(`/api/address/getUserAddrList`).then(response => {
-        this.addressArray = response.data.content
-      })
+    async getUserList () {
+      let params = { userPhone: userPhone,accessToken:accessToken }
+      const res = await fetch(`/page/exchange/list`, qs.stringify(params))
+      if(!(res.code=="0000")){
+        this.$toast({
+          mask: false,
+          message: res.message
+        })
+        return
+      }
+      this.addressArray=res.data;
     }
   }
 }

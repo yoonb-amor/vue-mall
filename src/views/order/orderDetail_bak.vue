@@ -2,7 +2,7 @@
   <!-- 订单详情 -->
   <div class="order-detail-page">
     <cm-header>
-      <span slot="left" @click="goBack()">
+      <span slot="left" @click="$router.go(-1)">
         <svg-icon icon-class="white-btn"></svg-icon>
       </span>
       <i>订单详情</i>
@@ -12,8 +12,8 @@
         <li class="receiver-addres">
           <svg-icon icon-class="shipping-address"></svg-icon>
           <div class="address-content">
-            <label>收货人：{{orderFormData.orderShipping.receiverName}} {{orderFormData.orderShipping.receiverMobile}}</label>
-            <span>{{orderFormData.orderShipping.receiverAddress}}</span>
+            <label>收货人：{{orderForm.toName}} {{orderForm.toPhone}}</label>
+            <span>{{orderForm.fullAddress}}</span>
           </div>
         </li>
       </ul>
@@ -23,36 +23,37 @@
       <ul class="order-list">
         <li class="list-item">
           <div class="store-info">
-            <span>订单号：{{orderFormData.orderNumber }}</span>
+            <img v-lazy="orderForm.logoUrl" class="header-img" />
+            <span>{{orderForm.shopName }}</span>
           </div>
-          <span>{{orderFormData.gmtCreate}}</span>
+          <span>待支付</span>
         </li>
 
         <li
           class="item-info"
-          v-for="(appOrderProduct,index) in orderFormData.orderItems"
+          v-for="(appOrderProduct,index) in orderForm.appOrderProductVos"
           :key="index"
         >
-          <img v-lazy="appOrderProduct.productImg" />
+          <img v-lazy="appOrderProduct.productMainUrl" />
           <div class="order-detail">
             <p class="info-one">
-              <span class="product-name">{{appOrderProduct.productStyle}}</span>
-              <b>￥{{appOrderProduct.jdPrice}}</b>
+              <span class="product-name">{{appOrderProduct.productName}}</span>
+              <b>￥{{appOrderProduct.productAmount}}</b>
             </p>
             <p class="info-two">
-              <span>{{appOrderProduct.skuName}}</span>
-              <span>×{{appOrderProduct.num}}</span>
+              <span>{{appOrderProduct.fullName}}</span>
+              <span>×{{appOrderProduct.quantity}}</span>
             </p>
           </div>
         </li>
 
         <li class="order-count">
           <span>订单总价：</span>
-          <i>￥{{orderFormData.jdPrice}}</i>
+          <i>￥{{orderForm.amount}}</i>
         </li>
         <li class="real-pay">
           <span>实付款：</span>
-          <i>￥{{orderFormData.payment}}</i>
+          <i>￥{{orderForm.amount}}</i>
         </li>
       </ul>
     </section>
@@ -61,157 +62,133 @@
       <ul class="info-list">
         <li class="info-title">
           <svg-icon icon-class="order-info"></svg-icon>
-          <span>京东快递运单号:{{waybillCode[0].deliveryOrderId}}</span>
+          <span>订单信息</span>
         </li>
-        <li
-          class="info-item"
-          v-for="(item,index) in orderTrack.reverse()"
-          :key="index"
-        >
-          <span>{{item.msgTime}}</span>
-          <label>{{item.content}}</label>
+        <li class="info-item">
+          <label>订单编号：</label>
+          <span>{{orderForm.orderNo}}</span>
+        </li>
+        <li class="info-item">
+          <label>创建时间：</label>
+          <span>{{orderForm.createDate}}</span>
         </li>
       </ul>
     </section>
+<van-popup v-model="show" round position="bottom" :style="{ height: '10%' }"></van-popup>
+    <vue-pickers
+      :show="show"
+      :columns="columns"
+      :defaultData="defaultData"
+      :selectData="pickData"
+      @cancel="close"
+      @confirm="confirmFn"
+    ></vue-pickers>
 
+    <div class="pay-btn">
+      <div class="pay-count">
+        <span>
+          共{{orderForm.quantity}}件商品，小计：
+          <i>￥{{orderForm.amount}}</i>
+        </span>
+        <span>59：59后取消订单</span>
+      </div>
+      <van-button type="danger" @click="handlePay" size="large">立即支付</van-button>
+    </div>
   </div>
 </template>
 
 <script>
-import fetch from '../../lib/fetch'
-import qs from 'qs'
-
 export default {
   name: 'orderDetail',
   data () {
     return {
       columns: 1,
-      orderFormData:{},
-      orderNumber: '',
-      orderTrack:[],
-      waybillCode:[],
-      jdOrderId:'',
+      orderForm: {
+        amount: 0,
+        appOrderProductVos: [
+          {
+            appealFlag: 0,
+            appealNo: 'string',
+            fullName: 'string',
+            id: 0,
+            productAmount: 0,
+            productMainUrl: 'string',
+            productName: 'string',
+            quantity: 0,
+            skuId: 0
+          }
+        ],
+        createDate: '2019-08-16T07:49:33.452Z',
+        deliveryDate: '2019-08-16T07:49:33.452Z',
+        finishDate: '2019-08-16T07:49:33.452Z',
+        freightAmount: 0,
+        fullAddress: 'string',
+        logoUrl: 'string',
+        orderNo: 'string',
+        outPayAmount: 0,
+        outerOrderNo: 'string',
+        payDate: '2019-08-16T07:49:33.452Z',
+        quantity: 0,
+        shopName: 'string',
+        status: 0,
+        toName: 'string',
+        toPhone: 'string'
+      },
+      defaultData: [
+        {
+          text: 'CoinPay',
+          value: 'CoinPay'
+        }
+      ],
+      pickData: {
+        data1: [
+          {
+            text: 'CoinPay',
+            value: 'CoinPay'
+          }
+        ]
+      },
+      show: false
     }
   },
   created () {
     this.initData()
   },
   methods: {
-    goBack(){
-      this.$router.push({
-        path: `/mine`
+    initData () {
+      this.$http
+        .post(`/api/order/detail`, {
+          orderNo: this.$route.params.orderNo
+        })
+        .then(response => {
+          this.orderForm = response.data.content
+        })
+    },
+    close () {
+      this.show = false
+    },
+    confirmFn () {
+      this.show = false
+      this.$toast.loading({
+        mask: true,
+        duration: 1000, // 持续展示 toast
+        forbidClick: true, // 禁用背景点击
+        loadingType: 'spinner',
+        message: '支付中...'
       })
+      this.$http
+        .get(`/api/coinPay/testPay?orderNo=${this.orderForm.orderNo}`)
+        .then(response => {})
+      setTimeout(() => {
+        // this.$toast({
+        //   mask: false,
+        //   message: "支付成功~"
+        // });
+        this.$router.push('/order/transactionDetails')
+      }, 1300)
     },
-    async initData () {
-      const params={
-        userPhone:userPhone,
-        accessToken:accessToken
-      };
-      const res= await fetch(`/page/exchange/trackingExchange`,qs.stringify(params))
-      if(!(res.code=="0000")){
-        this.$toast({
-          mask: false,
-          message: res.message
-        })
-        return
-      }
-      this.orderFormData=res.data.rows[0];
-      this.getWuLiu();
-    },
-    async getWuLiu(){
-      const orderNum=this.orderNumber?this.orderNumber:this.orderFormData.orderNumber;
-      const params={
-        userPhone:userPhone,
-        accessToken:accessToken,
-        orderNumber:orderNum
-      };
-      const res= await fetch(`/page/exchange/logisticsExchange`,qs.stringify(params))
-      if(!(res.code=="0000")){
-        this.$toast({
-          mask: false,
-          message: res.message
-        })
-        return
-      }
-      this.orderTrack=res.data.orderTrack;
-      this.waybillCode=res.data.waybillCode;
-
-      /*this.orderTrack=[
-        {
-          "msgTime": "2020-06-30 13:14:11",
-          "content": "您提交了订单，请等待系统确认",
-          "operator": "客户"
-        },
-        {
-          "msgTime": "2020-06-30 13:14:34",
-          "content": "您的订单已经进入京东合肥仓库准备出库",
-          "operator": "系统"
-        },
-        {
-          "msgTime": "2020-06-30 13:14:34",
-          "content": "您的订单预计2020-06-30 13:14开始处理，请您耐心等待",
-          "operator": "系统"
-        },
-        {
-          "msgTime": "2020-06-30 13:14:50",
-          "content": "温馨提示：您的订单预计7月1日09:00-15:00送达您手中",
-          "operator": "系统"
-        },
-        {
-          "msgTime": "2020-06-30 13:23:53",
-          "content": "您的订单已经打印完成",
-          "operator": "zhouhuan30"
-        },
-        {
-          "msgTime": "2020-06-30 13:53:03",
-          "content": "拣货完成",
-          "operator": "张有艳"
-        },
-        {
-          "msgTime": "2020-06-30 16:32:22",
-          "content": "扫描完成",
-          "operator": "刘淑玲"
-        },
-        {
-          "msgTime": "2020-06-30 16:32:22",
-          "content": "打包完成",
-          "operator": "京东打包员"
-        },
-        {
-          "msgTime": "2020-06-30 16:46:22",
-          "content": "您的订单在京东【合肥分拣中心】分拣完成",
-          "operator": "樊恒友"
-        },
-        {
-          "msgTime": "2020-06-30 17:37:40",
-          "content": "您的订单由京东【合肥分拣中心】送往【合肥海恒营业部】",
-          "operator": "方秀添"
-        },
-        {
-          "msgTime": "2020-07-01 07:19:29",
-          "content": "您的订单已到达京东【合肥海恒营业部】",
-          "operator": "张帅"
-        },
-        {
-          "msgTime": "2020-07-01 08:19:51",
-          "content": "您的订单正在配送途中（快递员：李广健，电话：18297851504），请您耐心等待。 ",
-          "operator": "李广健"
-        },
-        {
-          "msgTime": "2020-07-01 13:24:35",
-          "content": "您的订单已由本人签收。如有疑问您可以联系配送员【李广健，18297851504】确认。感谢您在京东购物，欢迎再次光临。",
-          "operator": "李广健"
-        }
-      ];
-      this.waybillCode=[
-        {
-          "parentId": 0,
-          "orderId": 120265221406,
-          "carrier": "京东快递",
-          "deliveryOrderId": "JD0020121603282"
-        }
-      ];
-      this.jdOrderId="120265221406";*/
+    handlePay () {
+      this.show = true
     }
   }
 }
@@ -249,7 +226,7 @@ export default {
             color: #3a3a3a;
             padding-left: 3px;
             font-weight: 600;
-            font-size: 10px;
+            font-size: 13px;
           }
         }
       }

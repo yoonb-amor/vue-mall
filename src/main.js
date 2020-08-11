@@ -20,6 +20,7 @@ import '@/icons' // icon
 import EventBus from './utils/eventBus'
 import VueClipboard from 'vue-clipboard2'
 import './utils/validator.js'
+
 import {
   Swipe,
   Toast,

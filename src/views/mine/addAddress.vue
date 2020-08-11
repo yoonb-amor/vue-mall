@@ -21,20 +21,6 @@
           <van-cell title="联系人" />
           <div class="address-name">
             <van-field v-model="addressInfo.receiverName" placeholder="请输入姓名" />
-            <div class="gender-tags">
-              <van-tag
-                color="#3A3A3A"
-                :class="{'isActive':addressInfo.receiverGender === 0}"
-                @click="handleChooseGender(0)"
-                plain
-              >女士</van-tag>
-              <van-tag
-                color="#3A3A3A"
-                :class="{'isActive':addressInfo.receiverGender === 1}"
-                @click="handleChooseGender(1)"
-                plain
-              >男士</van-tag>
-            </div>
           </div>
         </li>
         <li class="address-item">
@@ -56,29 +42,6 @@
           <van-cell title="地址" />
           <div class="address-name">
             <van-field v-model="addressInfo.address" placeholder="如：道路、门牌号、小区、楼栋号、单元室等" />
-          </div>
-        </li>
-        <li class="address-item">
-          <van-cell title="标签" />
-          <div class="address-tags">
-            <van-tag
-              color="#3A3A3A"
-              :class="{'isActive':addressInfo.tag === '家'}"
-              @click="handleChooseHome('家')"
-              plain
-            >家</van-tag>
-            <van-tag
-              color="#3A3A3A"
-              :class="{'isActive':addressInfo.tag === '学校'}"
-              @click="handleChooseHome('学校')"
-              plain
-            >学校</van-tag>
-            <van-tag
-              color="#3A3A3A"
-              :class="{'isActive':addressInfo.tag === '公司'}"
-              @click="handleChooseHome('公司')"
-              plain
-            >公司</van-tag>
           </div>
         </li>
         <li class="address-default">
@@ -118,8 +81,8 @@
               <li
                 v-for="(item,index) in list"
                 :class="[{'addSelectActive':index == provinceIndex}]"
-                :key="index"
-              >{{item.areaName}}</li>
+                :key="item.id"
+              >{{item.name}}</li>
             </ul>
             <ul
               @touchstart="touchStart($event,'city')"
@@ -132,7 +95,7 @@
                 v-for="(item,index) in list2"
                 :class="[{'addSelectActive':index == cityIndex}]"
                 :key="index"
-              >{{item.areaName}}</li>
+              >{{item.name}}</li>
             </ul>
             <ul
               @touchstart="touchStart($event,'district')"
@@ -145,7 +108,7 @@
                 v-for="(item,index) in list3"
                 :class="[{'addSelectActive':index == districtIndex}]"
                 :key="index"
-              >{{item.areaName}}</li>
+              >{{item.name}}</li>
             </ul>
           </div>
         </div>
@@ -154,16 +117,23 @@
   </div>
 </template>
 <script>
+import qs from 'qs';
+import fetch from '../../lib/fetch.js';
 export default {
   name: 'addAddress',
   data () {
     return {
+      queryData:{
+        pageFrom:0,
+        programId:0,
+      },
+
       show: false,
       parentAreaId: 0,
       addressInfo: {
-        tag: '家',
-        receiverGender: 0,
-        defaultAddrFlag: 0
+        defaultAddrFlag: 1,
+        receiverName:'',
+        receiverPhone:''
       },
 
       list: [],
@@ -199,7 +169,7 @@ export default {
   watch: {
     // 监听省滑动
     provinceVal (value) {
-      this.$http
+      /*this.$http
         .get(`/api/address/getCnAreaList?parentAreaId=${value}`)
         .then(res => {
           if (res.data.code === 0) {
@@ -212,11 +182,11 @@ export default {
             }
           }
           this.dataProcessing()
-        })
+        })*/
     },
     // 监听市滑动
     cityVal (value) {
-      if (value) {
+      /*if (value) {
         this.$http
           .get(`/api/address/getCnAreaList?parentAreaId=${value}`)
           .then(res => {
@@ -228,26 +198,20 @@ export default {
             }
             this.dataProcessing()
           })
-      }
+      }*/
     }
   },
 
   created () {
     this.getProvinces()
-    this.getCitys()
-    this.getAreas()
     // 第一条数据为直辖市 so '-' 符号表示为第三列
     this.list3 = [{ areaName: '-', areaId: '' }]
+    this.queryData.pageFrom=this.$route.query.pageFrom;
+    this.queryData.programId=this.$route.query.programId;
+
   },
   methods: {
-    handleChooseHome (tag) {
-      this.addressInfo.tag = tag
-    },
-    handleChooseGender (gender) {
-      this.addressInfo.receiverGender = gender
-    },
-
-    handleSeveAddresInfo () {
+    async handleSeveAddresInfo () {
       if (
         !this.addressInfo.receiverName ||
         !this.addressInfo.receiverPhone ||
@@ -262,66 +226,99 @@ export default {
         return
       }
       this.addressInfo.fullAddress = this.addressInfo.fullAddress + this.addressInfo.address
-      this.$http
-        .post(`/api/address/updateUserAddr`, this.addressInfo)
-        .then(response => {
-          if (response.data.code === 0) {
-            this.$router.push('/mine/shippingAddress')
-          }
+      let reqData={};
+      reqData.addressId="";
+      reqData.consignee=this.addressInfo.receiverName;
+      reqData.recivePhone=this.addressInfo.receiverPhone;
+      reqData.streeAddress=this.addressInfo.address;
+      reqData.areaName=this.addressInfo.fullAddress;
+      if(this.addressInfo.defaultAddrFlag){
+        reqData.beDefault=0;
+      }else{
+        reqData.beDefault=1;
+      }
+      reqData.province=this.addressInfo.province;
+      reqData.city=this.addressInfo.city;
+      reqData.district=this.addressInfo.district;
+      reqData.accessToken=accessToken;
+      reqData.userPhone=userPhone;
+      let that=this;
+      const res= await fetch(`/page/exchange/add`, qs.stringify(reqData))
+      if(res.code=='0000'){
+        this.goFrom();
+      }else{
+        this.$toast({
+          mask: false,
+          message: res.message
         })
+        return
+      }
+    },
+    goFrom(){
+        if(this.queryData.pageFrom==1){
+          this.$router.push({
+            path: `/order/chooseAddress`,
+            query: {
+              programId:this.queryData.programId,
+            }
+          })
+        }else{
+          this.$router.push({
+            path: `/mine/shippingAddress`
+          })
+        }
+
     },
 
     showPicker () {
       this.show = true
     },
     // 分层获取中国地址信息
-    getProvinces () {
+    async getProvinces () {
+     const res= await fetch(`/mobile/voucher/getAddress`, qs.stringify({"id":1}))
+      if(!res.success) return ;
+      this.list = res.ext;
+      this.val.provinceVal = this.list[0]
+      this.list2=this.val.provinceVal.children
+      this.val.cityVal = this.list2[0]
+      this.list3=this.val.cityVal.children
+      this.val.areaVal=this.list3[0]
+      /*const data={"id":1};
       this.$http
-        .get(`/api/address/getCnAreaList?parentAreaId=${this.parentAreaId}`)
+        .post(`/mobile/voucher/getAddress?id=1`,data)
         .then(response => {
-          this.list = response.data.content
-          this.val.provinceVal = this.list[0]
-        })
+          if(response.status==200&&response.data.success){
+            this.list = response.data.ext;
+            this.val.provinceVal = this.list[0]
+            this.list2=this.val.provinceVal.children
+            this.val.cityVal = this.list2[0]
+            this.list3=this.val.cityVal.children
+            this.val.areaVal=this.list3[0]
+          }
+        })*/
     },
-    getCitys () {
-      this.$http
-        .get(`/api/address/getCnAreaList?parentAreaId=1`)
-        .then(response => {
-          this.list2 = response.data.content
-          this.val.cityVal = this.list2[0]
-        })
-    },
-    getAreas () {
-      this.$http
-        .get(`/api/address/getCnAreaList?parentAreaId=72`)
-        .then(response => {
-          this.list3 = response.data.content
-          this.val.areaVal = this.list3[0]
-        })
-    },
-
     complete () {
-      if (!this.val.areaVal.areaId) {
+      if (!this.val.areaVal.id) {
         this.val.areaVal = {
-          areaId: '',
-          areaName: ''
+          name: '',
+          id: ''
         }
       }
-      if (!this.val.cityVal.areaId) {
+      if (!this.val.cityVal.id) {
         this.val.cityVal = {
-          areaName: '',
-          areaId: ''
+          name: '',
+          id: ''
         }
       }
       this.show = false
-      this.addressInfo.province = this.val.provinceVal.areaId
-      this.addressInfo.city = this.val.cityVal.areaId
-      this.addressInfo.district = this.val.areaVal.areaId
+      this.addressInfo.province = this.val.provinceVal.id
+      this.addressInfo.city = this.val.cityVal.id
+      this.addressInfo.district = this.val.areaVal.id
 
       this.addressInfo.fullAddress =
-        this.val.provinceVal.areaName +
-        this.val.cityVal.areaName +
-        this.val.areaVal.areaName
+        this.val.provinceVal.name +
+        this.val.cityVal.name +
+        this.val.areaVal.name
     },
     cancel () {
       this.show = false
@@ -445,6 +442,10 @@ export default {
           this.cityStyle.WebkitTransform = this.districtStyle.WebkitTransform =
             'translate3d(0px,0px,0px)'
           this.cityIndex = this.districtIndex = 0
+
+          this.val.provinceVal = this.list[this.provinceIndex]
+          this.provinceVal = this.val.provinceVal.id
+          this.list2=this.val.provinceVal.children
           break
         case 'city':
           let cityTranslateY = parseInt(
@@ -460,6 +461,14 @@ export default {
             'px,0px)'
           this.districtStyle.WebkitTransform = 'translate3d(0px,0px,0px)'
           this.districtIndex = 0
+
+          this.val.provinceVal = this.list[this.provinceIndex]
+          this.provinceVal = this.val.provinceVal.id
+          this.list2=this.val.provinceVal.children
+
+          this.val.cityVal = this.list2[this.cityIndex]
+          this.cityVal = this.val.cityVal.id
+          this.list3=this.val.cityVal.children
           break
         case 'district':
           let districtTranslateY = parseInt(
@@ -482,13 +491,20 @@ export default {
     },
     // 数据处理
     dataProcessing () {
-      // 滑动数据传输 数据处理
       this.val.provinceVal = this.list[this.provinceIndex]
+      this.provinceVal = this.val.provinceVal.id
+      this.val.cityVal = this.list2[this.cityIndex]
+      this.cityVal = this.list2[this.cityIndex].id
+      this.val.areaVal = this.list3[this.districtIndex]
+      this.areaVal = this.list3[this.districtIndex].id
+
+      // 滑动数据传输 数据处理
+      /*this.val.provinceVal = this.list[this.provinceIndex]
       this.provinceVal = this.list[this.provinceIndex].areaId
       this.val.cityVal = this.list2[this.cityIndex]
       this.cityVal = this.list2[this.cityIndex].areaId
       this.val.areaVal = this.list3[this.districtIndex]
-      this.areaVal = this.list3[this.districtIndex].areaId
+      this.areaVal = this.list3[this.districtIndex].areaId*/
       // this.val.cityVal = this.addressData[this.provinceIndex].city[this.cityIndex].name
       // this.val.areaVal = this.addressData[this.provinceIndex].city[this.cityIndex].area[this.districtIndex]
       // this.$emit('getAddress', this.val)
@@ -506,7 +522,7 @@ export default {
   .address-content {
     margin-top: 20px;
     padding: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
     background-color: #fff;
     border-radius: 8px;
     .address-list {

@@ -307,9 +307,6 @@ export default {
           this.list3 = response.data.content
         })
     },
-    handleChooseGender (gender) {
-      this.addressInfo.receiverGender = gender
-    },
     handleSeveAddresInfo () {
       this.addressInfo.fullAddress =
         this.addressInfo.fullAddress + this.addressInfo.address

@@ -1,7 +1,7 @@
 <template>
   <div class="refund-after-sale">
     <cm-header>
-      <span slot="left" @click="$router.go(-1)">
+      <span slot="left" @click="goBack()">
         <img src="../../assets/icons/left-green-white.png" />
       </span>
       <i>退款/售后</i>
@@ -133,6 +133,11 @@ export default {
       })
   },
   methods: {
+    goBack(){
+      this.$router.push({
+        path: `/mine`
+      })
+    },
     handleGoToOrderDetail (orderList) {
       //  this.$router.push(`/order/appealDetail?appealNo=${appealNo}`);
       this.$router.push({

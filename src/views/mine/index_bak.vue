@@ -21,20 +21,46 @@
           <li class="info-item">
             <span>积分</span>
 <!--            <b>{{userInfo.footAttention}}</b>-->
-            <b>{{exchangeType}}</b>
+            <b>100</b>
           </li>
 
         </ul>
       </section>
     </div>
 
-    <section class="order-all">
-      <span class="look-orders"></span>
-      <ul class="order-list">
-        <li class="order-item" @click="showOrder()">
+    <section class="ticket-all">
+      <router-link to="/order" class="look-orders" tag="span">查看全部兑换券>></router-link>
+      <ul class="ticket-list">
+        <router-link :to="`/order?type=1`" class="ticket-item" tag="li">
+          <svg-icon icon-class="pending-pay"></svg-icon>
+          <span>待使用</span>
+        </router-link>
+        <router-link :to="`/order?type=2`" class="ticket-item" tag="li">
+          <svg-icon icon-class="be-delivered"></svg-icon>
+          <span>已使用</span>
+        </router-link>
+        <router-link :to="`/order?type=3`" class="ticket-item" tag="li">
           <svg-icon icon-class="pending-receipt"></svg-icon>
-          <span>兑换历史</span>
-        </li>
+          <span>过期关闭</span>
+        </router-link>
+      </ul>
+    </section>
+
+    <section class="order-all">
+      <router-link to="/order" class="look-orders" tag="span">查看全部订单>></router-link>
+      <ul class="order-list">
+        <router-link :to="`/order?type=1`" class="order-item" tag="li">
+          <svg-icon icon-class="pending-pay"></svg-icon>
+          <span>待付款</span>
+        </router-link>
+        <router-link :to="`/order?type=2`" class="order-item" tag="li">
+          <svg-icon icon-class="be-delivered"></svg-icon>
+          <span>待发货</span>
+        </router-link>
+        <router-link :to="`/order?type=3`" class="order-item" tag="li">
+          <svg-icon icon-class="pending-receipt"></svg-icon>
+          <span>待收货</span>
+        </router-link>
         <router-link to="/order/refundAfterSale" class="order-item" tag="li">
           <svg-icon icon-class="all-orders"></svg-icon>
           <span>退换/售后</span>
@@ -50,6 +76,27 @@
             <span>收货地址</span>
           </div>
           <van-icon name="arrow" color="#DBDBDB" />
+        </router-link>
+        <router-link to="/message/index" class="option-item" tag="li">
+          <div class="item-info">
+            <svg-icon class="incon" icon-class="message-center"></svg-icon>
+            <span>消息中心</span>
+          </div>
+          <van-icon color="#DBDBDB" name="arrow" />
+        </router-link>
+        <router-link to="/mine/helpCenter" class="option-item" tag="li">
+          <div class="item-info">
+            <svg-icon class="incon" icon-class="help-center"></svg-icon>
+            <span>帮助中心</span>
+          </div>
+          <van-icon color="#DBDBDB" name="arrow" />
+        </router-link>
+        <router-link to="/mine/setting" class="option-item" tag="li">
+          <div class="item-info">
+            <svg-icon class="incon" icon-class="setting"></svg-icon>
+            <span>设置</span>
+          </div>
+          <van-icon color="#DBDBDB" name="arrow" />
         </router-link>
       </ul>
     </section>
@@ -139,8 +186,6 @@ export default {
   name: 'mine',
   data () {
     return {
-      userPhone:userPhone,
-      exchangeType:exchangeType,
       show: false,
       nodeName: '',
       userInfo: {},
@@ -149,15 +194,60 @@ export default {
       columns: 1
     }
   },
+  activated () {
+    this.initUserInfo()
+  },
   computed: {},
   mounted () {
     this.$eventBus.$emit('changeTag', 3)
   },
   methods: {
-    showOrder(){
-      this.$router.push({
-        path: `/order/orderDetail`
+    handleMerchantsSettled () {
+      // this.merchantsSettledStatus = 2
+      switch (this.merchantsSettledStatus) {
+        case 0: // 待审核
+          this.$router.push(`/merchantsSettled/waitingReviewResults`)
+          break
+        case 1: // 通过
+          break
+        case 2: // 不通过
+          this.$router.push(`/merchantsSettled/auditFailure`)
+          break
+        case 3: // 未缴纳保证金
+          this.$router.push(`/merchantsSettled/payDeposit`)
+          break
+        default:
+          // -1未申请入驻
+          this.$router.push(`/merchantsSettled/index`)
+          break
+      }
+    },
+    initUserInfo () {
+      this.$http.get(`/api/user/getUserInfo`).then(response => {
+        this.userInfo = response.data.content
+        // this.userInfo.nodeType = 63;
+        this.merchantsSettledStatus = response.data.content.merchantStatus
+        this.status = response.data.content.status
+        this.setNodeType(this.userInfo.nodeType)
       })
+    },
+    setNodeType (nodeType) {
+      let resType = [];
+      [1, 2, 4, 8, 16, 32].forEach(it => {
+        if ((nodeType & it) === it) {
+          resType.push(it)
+        }
+      })
+      let nodeObj = {
+        1: '链猫掌柜',
+        2: '区级节点',
+        4: '市级节点',
+        8: '州级节点',
+        16: '行业节点',
+        32: '超级节点'
+      }
+      let index = resType.pop()
+      this.nodeName = nodeObj[index]
     },
     handleClose () {
       this.show = false
