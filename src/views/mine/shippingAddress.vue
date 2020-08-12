@@ -63,10 +63,12 @@ export default {
         }
       })
     },
-    handleGoToEditAddrss (address) {
+    handleGoToEditAddrss (addressId) {
       this.$router.push({
         path: '/mine/editAddress',
-        query: Object.assign({}, address)
+        query: {
+          addressId:addressId
+        }
       })
     },
     async getUserList () {

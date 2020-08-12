@@ -168,42 +168,27 @@ export default {
   },
   watch: {
     // 监听省滑动
-    provinceVal (value) {
-      /*this.$http
-        .get(`/api/address/getCnAreaList?parentAreaId=${value}`)
-        .then(res => {
-          if (res.data.code === 0) {
-            this.list2 =
-              res.data.content.length > 0
-                ? res.data.content
-                : [{ areaName: '-' }]
-            if (res.data.content.length < 1) {
-              this.list3 = [{ areaName: '-' }]
-            }
-          }
-          this.dataProcessing()
-        })*/
+    async provinceVal (value) {
+      const res= await fetch(`/mobile/voucher/getArea`, qs.stringify({"id":value}))
+      if(res&&res.length>0){
+        this.list2=res;
+      }
+      this.dataProcessing()
     },
     // 监听市滑动
-    cityVal (value) {
-      /*if (value) {
-        this.$http
-          .get(`/api/address/getCnAreaList?parentAreaId=${value}`)
-          .then(res => {
-            if (res.data.code === 0) {
-              this.list3 =
-                res.data.content.length > 0
-                  ? res.data.content
-                  : [{ areaName: '-' }]
-            }
-            this.dataProcessing()
-          })
-      }*/
+    async cityVal (value) {
+      const res= await fetch(`/mobile/voucher/getArea`, qs.stringify({"id":value}))
+      if(res&&res.length>0){
+        this.list3=res;
+      }
+      this.dataProcessing()
     }
   },
 
   created () {
     this.getProvinces()
+    this.getCitys()
+    this.getAreas()
     // 第一条数据为直辖市 so '-' 符号表示为第三列
     this.list3 = [{ areaName: '-', areaId: '' }]
     this.queryData.pageFrom=this.$route.query.pageFrom;
@@ -232,7 +217,7 @@ export default {
       reqData.recivePhone=this.addressInfo.receiverPhone;
       reqData.streeAddress=this.addressInfo.address;
       reqData.areaName=this.addressInfo.fullAddress;
-      if(this.addressInfo.defaultAddrFlag){
+      if(this.addressInfo.defaultAddrFlag===true){
         reqData.beDefault=0;
       }else{
         reqData.beDefault=1;
@@ -275,27 +260,25 @@ export default {
     },
     // 分层获取中国地址信息
     async getProvinces () {
-      const res= await fetch(`/mobile/voucher/getAddress`, qs.stringify({"id":1}))
-      if(!res.success) return ;
-      this.list = res.ext;
-      this.val.provinceVal = this.list[0]
-      this.list2=this.val.provinceVal.children
-      this.val.cityVal = this.list2[0]
-      this.list3=this.val.cityVal.children
-      this.val.areaVal=this.list3[0]
-      /*const data={"id":1};
-      this.$http
-        .post(`/mobile/voucher/getAddress?id=1`,data)
-        .then(response => {
-          if(response.status==200&&response.data.success){
-            this.list = response.data.ext;
-            this.val.provinceVal = this.list[0]
-            this.list2=this.val.provinceVal.children
-            this.val.cityVal = this.list2[0]
-            this.list3=this.val.cityVal.children
-            this.val.areaVal=this.list3[0]
-          }
-        })*/
+      const res= await fetch(`/mobile/voucher/getArea`, qs.stringify({"id":1}))
+      if(res&&res.length>0){
+        this.list=res;
+        this.val.provinceVal = this.list[0]
+      }
+    },
+    async getCitys () {
+      const res= await fetch(`/mobile/voucher/getArea`, qs.stringify({"id":99}))
+      if(res&&res.length>0){
+        this.list2=res;
+        this.val.cityVal = this.list2[0]
+      }
+    },
+    async getAreas () {
+      const res= await fetch(`/mobile/voucher/getArea`, qs.stringify({"id":2812}))
+      if(res&&res.length>0){
+        this.list3=res;
+        this.val.areaVal = this.list3[0]
+      }
     },
     complete () {
       if (!this.val.areaVal.id) {
@@ -443,9 +426,6 @@ export default {
             'translate3d(0px,0px,0px)'
           this.cityIndex = this.districtIndex = 0
 
-          this.val.provinceVal = this.list[this.provinceIndex]
-          this.provinceVal = this.val.provinceVal.id
-          this.list2=this.val.provinceVal.children
           break
         case 'city':
           let cityTranslateY = parseInt(
@@ -462,13 +442,6 @@ export default {
           this.districtStyle.WebkitTransform = 'translate3d(0px,0px,0px)'
           this.districtIndex = 0
 
-          this.val.provinceVal = this.list[this.provinceIndex]
-          this.provinceVal = this.val.provinceVal.id
-          this.list2=this.val.provinceVal.children
-
-          this.val.cityVal = this.list2[this.cityIndex]
-          this.cityVal = this.val.cityVal.id
-          this.list3=this.val.cityVal.children
           break
         case 'district':
           let districtTranslateY = parseInt(

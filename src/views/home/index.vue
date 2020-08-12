@@ -36,13 +36,13 @@
       </section>
     </section>
 
-    <section v-if="list200&&list200.byUnicomPrograms&&list200.byUnicomPrograms.length>0" class="spike-area spike-area-bg-1">
+    <section v-if="list200&&list200.byUnicomPrograms&&list200.byUnicomPrograms.length>0" class="spike-area spike-area-bg-3">
       <div class="spike-icon">
         <img src="../../assets/image/fj/icon3.png">
         <span class="span1">价值200元礼包&nbsp;<span class="span2">(仅需180元, 就送200元超值礼包)</span></span>
       </div>
       <section class="grid">
-        <div v-for="(item,index) in list200.byUnicomPrograms" :key="index" class="product bg-color-1">
+        <div v-for="(item,index) in list200.byUnicomPrograms" :key="index" class="product bg-color-3">
           <div class="product__info">
             <img class="product__image" :src="DEFAULT_HTTP_URL+item.imagePath"/>
             <img  class="product__image__btn" src="../../assets/image/fj/buy-btn.png"/>
@@ -52,13 +52,13 @@
       </section>
     </section>
 
-    <section v-if="list300&&list300.byUnicomPrograms&&list300.byUnicomPrograms.length>0" class="spike-area spike-area-bg-2">
+    <section v-if="list300&&list300.byUnicomPrograms&&list300.byUnicomPrograms.length>0" class="spike-area spike-area-bg-4">
       <div class="spike-icon">
         <img src="../../assets/image/fj/icon4.png">
         <span class="span1">价值300元礼包&nbsp;<span class="span2">(仅需280元, 就送300元超值礼包)</span></span>
       </div>
       <section class="grid">
-        <div v-for="(item,index) in list300.byUnicomPrograms" :key="index" class="product bg-color-1">
+        <div v-for="(item,index) in list300.byUnicomPrograms" :key="index" class="product bg-color-4">
           <div class="product__info">
             <img class="product__image" :src="DEFAULT_HTTP_URL+item.imagePath"/>
             <img  class="product__image__btn" src="../../assets/image/fj/buy-btn.png"/>
@@ -170,9 +170,14 @@
     .spike-area-bg-1 {
       background: url("../../assets/image/fj/bg1.png") no-repeat;
     }
-
     .spike-area-bg-2 {
       background: url("../../assets/image/fj/bg2.png") no-repeat;
+    }
+    .spike-area-bg-3 {
+      background: url("../../assets/image/fj/bg3.png") no-repeat;
+    }
+    .spike-area-bg-4 {
+      background: url("../../assets/image/fj/bg4.png") no-repeat;
     }
 
     .spike-area {
@@ -195,7 +200,7 @@
 
         .span1 {
           font-size: 18px;
-
+          color: #ffffff;
           .span2 {
             font-size: 12px;
           }
@@ -225,9 +230,16 @@
           background: url("../../assets/image/fj/p-bg-1.png") no-repeat;
           background-size: 100% 100%;
         }
-
         .bg-color-2 {
           background: url("../../assets/image/fj/p-bg-2.png") no-repeat;
+          background-size: 100% 100%;
+        }
+        .bg-color-3 {
+          background: url("../../assets/image/fj/p-bg-3.png") no-repeat;
+          background-size: 100% 100%;
+        }
+        .bg-color-4 {
+          background: url("../../assets/image/fj/p-bg-4.png") no-repeat;
           background-size: 100% 100%;
         }
 

@@ -11,11 +11,11 @@
       <ul class="info-list">
         <li class="receiver-addres">
           <div class="address-content">
-            <div v-if="addressId">
+            <div v-if="addressId" class="address-div">
               <svg-icon icon-class="shipping-address"></svg-icon>
               <span class="address-userName">{{addressData.consignee}}</span>
               <span class="address-userPhone">{{addressData.phone}}</span>
-              <span class="address-fullAddress" >{{addressData.allAreaName}}-{{addressData.streetAddress}}</span>
+              <span class="address-address" >{{addressData.allAreaName}}-{{addressData.streetAddress}}</span>
             </div>
             <span class="address-fullAddress" v-else>请选择收货人地址</span>
           </div>
@@ -312,12 +312,11 @@
     .order-info {
       background-color: #fff;
       border-radius: 5px;
-      margin-top: 20px;
+      margin-top: 10px;
       padding: 20px;
 
       .info-list {
         color: #3a3a3a;
-
         .info-title {
           display: flex;
           font-weight: 600;
@@ -347,19 +346,45 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            .address-div{
+              max-height: 70px;
+            }
             .address-userName {
               font-size: 13px;
-              font-weight: 700;
+              font-weight: bold;
               padding-left: 10px;
+              display: inline-block;
+              width: 100px;
+              position: absolute;
+              top: 80px;
+              left: 60px;
             }
             .address-userPhone {
               font-size: 13px;
-              font-weight: 700;
+              font-weight: bold;
               padding-left: 10px;
+              display: inline-block;
+              width: 120px;
+              position: absolute;
+              top: 80px;
+              left: 160px;
+            }
+            .address-address{
+              font-size: 13px;
+              font-weight: bold;
+              padding-left: 10px;
+              display: inline-block;
+              width: 260px;
+              position: absolute;
+              top: 100px;
+              left: 60px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
             .address-fullAddress {
               font-size: 13px;
-              font-weight: 700;
+              font-weight: bold;
               padding-left: 10px;
             }
           }
