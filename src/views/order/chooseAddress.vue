@@ -1,7 +1,7 @@
 <template>
   <div class="choose-address">
     <cm-header>
-      <span slot="left" @click="$router.push('/mine')">
+      <span slot="left" @click="goBack()">
         <svg-icon icon-class="green-btn"></svg-icon>
       </span>
       <i>选择地址</i>
@@ -56,6 +56,20 @@ export default {
     this.getUserList()
   },
   methods: {
+    goBack(){
+      if (this.$route.query.programId) {
+        this.$router.push({
+          path: `/order/confirmOrder`,
+          query: {
+            programId: this.$route.query.programId
+          }
+        })
+      } else {
+        this.$router.push({
+          path: `/mine`,
+        })
+      }
+    },
     addAddress(){
       this.$router.push({
         path: `/mine/addAddress`,
@@ -109,10 +123,6 @@ export default {
       let params = { userPhone: userPhone,accessToken:accessToken }
       const res = await fetch(`/page/exchange/list`, qs.stringify(params))
       if(!(res.code=="0000")){
-        this.$toast({
-          mask: false,
-          message: res.message
-        })
         return
       }
       this.addressArray=res.data;

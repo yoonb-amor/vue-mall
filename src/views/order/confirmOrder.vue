@@ -2,7 +2,7 @@
   <!-- 确认订单 -->
   <div class="order-detail-page">
     <cm-header>
-      <span slot="left" @click="$router.go(-1)">
+      <span slot="left" @click="goBack()">
         <svg-icon icon-class="white-btn"></svg-icon>
       </span>
       <i>确认订单</i>
@@ -22,71 +22,36 @@
           <svg-icon class="arrow-icon-right" icon-class="arrow-icon-right"></svg-icon>
         </li>
       </ul>
-    </section>
+      </section>
 
     <section class="order-card" v-if="packageDetail!=null">
       <div class="product bg-color-2">
-        <img class="product__image" :src="'http://localhost:8080/'+packageDetail.byUnicomPrograms[0].imagePath"/>
+        <img class="product__image" :src="DEFAULT_HTTP_URL+packageDetail.byUnicomPrograms[0].imagePath"/>
         <div class="product__info">
           <span class="product__info_name">{{packageDetail.packageType}}</span>
           <span v-for="(item,index) in packageDetail.byUnicomPrograms[0].byUnicomCommodities">
             <span>{{item.jdProductName}}</span>
           </span>
         </div>
+        <div class="pay-count">
+        <span>
+          共{{packageDetail.byUnicomPrograms[0].byUnicomCommodities.length}}件商品
+          <!--<i>，小计：￥{{ packageDetail.packagePrice}}</i>-->
+        </span>
+        </div>
       </div>
     </section>
+    <section>
 
-    <section
-      class="order-card"
-      v-for="(oderShopSkuInfo,index) in orderForm.oderShopSkuInfoVos"
-      :key="index"
-    >
-      <ul class="order-list">
-        <li class="list-item">
-          <div class="store-info">
-            <img v-lazy="oderShopSkuInfo.logoUrl" class="header-img"/>
-            <span>{{oderShopSkuInfo.shopName}}</span>
-          </div>
-          <span>待支付</span>
-        </li>
-        <li class="item-info" v-for="(orderSkuInfo,i) in oderShopSkuInfo.orderSkuInfoVos" :key="i">
-          <img v-lazy="orderSkuInfo.productMainUrl"/>
-          <div class="order-detail">
-            <p class="info-one">
-              <span>{{orderSkuInfo.productName}}</span>
-              <b>￥{{orderSkuInfo.productAmount}}</b>
-            </p>
-            <p class="info-two">
-              <span>{{orderSkuInfo.fullName}}</span>
-              <span>×{{orderSkuInfo.quantity }}</span>
-            </p>
-          </div>
-        </li>
-        <li class="order-count">
-          <span>快递：</span>
-          <i>￥{{oderShopSkuInfo.freightAmount}}</i>
-        </li>
-        <li class="real-pay">
-          <span>实付款：</span>
-          <i>￥{{oderShopSkuInfo.shopAllAmount}}</i>
-        </li>
-      </ul>
     </section>
     <div class="pay-btn">
-      <div class="pay-count">
-        <span>
-          共{{packageDetail.byUnicomPrograms[0].byUnicomCommodities.length}}件商品，小计：
-          <i>￥{{ packageDetail.packagePrice}}</i>
-        </span>
-      </div>
       <van-button type="danger" @click="handleSubmitOrder" size="large">立即兑换</van-button>
     </div>
-
-    <van-popup v-model="show" round position="bottom" :style="{ height: '10%' }"></van-popup>
   </div>
 </template>
 
 <script>
+  import { DEFAULT_HTTP_URL } from '../../config/index'
   import fetch from '../../lib/fetch'
   import qs from 'qs'
 
@@ -94,6 +59,7 @@
     name: 'ConfirmOrder',
     data () {
       return {
+        DEFAULT_HTTP_URL:DEFAULT_HTTP_URL,
         programId: '',
         addressId:'',
         addressData:{},
@@ -110,6 +76,11 @@
       this.getAddress()
     },
     methods: {
+      goBack(){
+        this.$router.push({
+          path: `/index`,
+        })
+      },
       async getPackageDetail () {
         this.programId = this.$route.query.programId
         let params = { programId: this.programId,
@@ -182,9 +153,6 @@
           }
         })
       },
-      close () {
-        this.show = false
-      },
       handleToChooseAddress () {
         this.$router.push({
           path: `/order/chooseAddress`,
@@ -210,17 +178,29 @@
 
       .product{
         width: 100%;
+        overflow: auto;
+        max-height: 400px;
         .product__image{
           width: 100%;
           display: block;
         }
         .product__info{
             width: 100%;
-          min-height: 200px;
           .product__info_name{
             color: #9b9b9b;
             font-size: 14px;
             display: block;
+          }
+        }
+        .pay-count {
+          display: flex;
+          justify-content: space-between;
+          font-size: 16px;
+          padding: 10px 0px 20px 0px;
+
+          i {
+            color: #ec3924;
+            font-weight: 700;
           }
         }
         span{
@@ -399,18 +379,6 @@
       left: 0;
       right: 0;
       padding: 0 16px;
-
-      .pay-count {
-        display: flex;
-        justify-content: space-between;
-        font-size: 16px;
-        padding: 10px 20px;
-
-        i {
-          color: #ec3924;
-          font-weight: 700;
-        }
-      }
 
       /deep/ .van-button--danger {
         background-color: #ec3924;

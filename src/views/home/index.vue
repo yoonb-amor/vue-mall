@@ -12,7 +12,7 @@
       <section class="grid">
           <div v-for="(item,index) in list60.byUnicomPrograms" :key="index" class="product bg-color-1">
             <div class="product__info">
-              <img class="product__image" :src="'http://localhost:8080/'+item.imagePath"/>
+              <img class="product__image" :src="DEFAULT_HTTP_URL+item.imagePath"/>
               <img  class="product__image__btn" src="../../assets/image/fj/buy-btn.png"/>
               <span v-on:click="goBuy(item)" class="action_text">立即兑换</span>
             </div>
@@ -28,7 +28,7 @@
       <section class="grid">
         <div v-for="(item,index) in list120.byUnicomPrograms" :key="index" class="product bg-color-2">
           <div class="product__info">
-            <img class="product__image" :src="'http://localhost:8080/'+item.imagePath"/>
+            <img class="product__image" :src="DEFAULT_HTTP_URL+item.imagePath"/>
             <img  class="product__image__btn" src="../../assets/image/fj/buy-btn.png"/>
             <span v-on:click="goBuy(item)" class="action_text">立即兑换</span>
           </div>
@@ -39,12 +39,12 @@
     <section v-if="list200&&list200.byUnicomPrograms&&list200.byUnicomPrograms.length>0" class="spike-area spike-area-bg-1">
       <div class="spike-icon">
         <img src="../../assets/image/fj/icon3.png">
-        <span class="span1">价值200元礼包&nbsp;<span class="span2">(仅需100元, 就送120元超值礼包)</span></span>
+        <span class="span1">价值200元礼包&nbsp;<span class="span2">(仅需180元, 就送200元超值礼包)</span></span>
       </div>
       <section class="grid">
         <div v-for="(item,index) in list200.byUnicomPrograms" :key="index" class="product bg-color-1">
           <div class="product__info">
-            <img class="product__image" :src="'http://localhost:8080/'+item.imagePath"/>
+            <img class="product__image" :src="DEFAULT_HTTP_URL+item.imagePath"/>
             <img  class="product__image__btn" src="../../assets/image/fj/buy-btn.png"/>
             <span v-on:click="goBuy(item)" class="action_text">立即兑换</span>
           </div>
@@ -55,12 +55,12 @@
     <section v-if="list300&&list300.byUnicomPrograms&&list300.byUnicomPrograms.length>0" class="spike-area spike-area-bg-2">
       <div class="spike-icon">
         <img src="../../assets/image/fj/icon4.png">
-        <span class="span1">价值300元礼包&nbsp;<span class="span2">(仅需100元, 就送120元超值礼包)</span></span>
+        <span class="span1">价值300元礼包&nbsp;<span class="span2">(仅需280元, 就送300元超值礼包)</span></span>
       </div>
       <section class="grid">
         <div v-for="(item,index) in list300.byUnicomPrograms" :key="index" class="product bg-color-1">
           <div class="product__info">
-            <img class="product__image" :src="'http://localhost:8080/'+item.imagePath"/>
+            <img class="product__image" :src="DEFAULT_HTTP_URL+item.imagePath"/>
             <img  class="product__image__btn" src="../../assets/image/fj/buy-btn.png"/>
             <span v-on:click="goBuy(item)" class="action_text">立即兑换</span>
           </div>
@@ -89,6 +89,7 @@
 </template>
 
 <script>
+  import { DEFAULT_HTTP_URL } from '../../config/index'
   import fetch from '../../lib/fetch'
   import qs from 'qs'
 
@@ -96,6 +97,7 @@
     name: 'index',
     data () {
       return {
+        DEFAULT_HTTP_URL:DEFAULT_HTTP_URL,
         systemMessage: {},
         mallMessage: {},
         package:[],
@@ -128,6 +130,9 @@
       doPackageData(){
           this.list60=this.package[0];
           this.list120=this.package[1];
+          this.list200=this.package[2];
+          this.list300=this.package[3];
+
       },
       goBuy:function (item) {
         this.$router.push({
@@ -163,11 +168,11 @@
     }
 
     .spike-area-bg-1 {
-      background: url("../../assets/image/fj/bg1.png");
+      background: url("../../assets/image/fj/bg1.png") no-repeat;
     }
 
     .spike-area-bg-2 {
-      background: url("../../assets/image/fj/bg2.png");
+      background: url("../../assets/image/fj/bg2.png") no-repeat;
     }
 
     .spike-area {
@@ -214,6 +219,7 @@
         -webkit-align-items: flex-start;
         -ms-flex-align: start;
         align-items: flex-start;
+        background: #ffffff;
 
         .bg-color-1 {
           background: url("../../assets/image/fj/p-bg-1.png") no-repeat;

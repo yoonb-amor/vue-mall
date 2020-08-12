@@ -26,7 +26,7 @@
           />
         </van-tabbar-item>
         <van-tabbar-item name="mine" to="/mine">
-          <span slot-scope="props" :class="props.active ? item_text_active : item_text">我</span>
+          <span slot-scope="props" :class="props.active ? item_text_active : item_text">个人中心</span>
           <img
             slot="icon"
             slot-scope="props"
@@ -91,7 +91,7 @@ export default {
   ul {
     height: 50px;
     .van-tabbar-item{
-      background: #ff3048;
+      background: linear-gradient(to right,#ec3924, #ff7428);
       .van-tabbar-item-text{
         color: #cdcdcd;
       }
@@ -99,6 +99,9 @@ export default {
         color: #ffffff;
       }
 
+    }
+    .van-tabbar-item:nth-child(2){
+      background: linear-gradient(to left,#ec3924, #ff7428);
     }
   }
 }

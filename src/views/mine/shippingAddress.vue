@@ -73,10 +73,6 @@ export default {
       let params = { userPhone: userPhone,accessToken:accessToken }
       const res = await fetch(`/page/exchange/list`, qs.stringify(params))
       if(!(res.code=="0000")){
-        this.$toast({
-          mask: false,
-          message: res.message
-        })
         return
       }
       this.addressArray=res.data;

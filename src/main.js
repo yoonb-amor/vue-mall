@@ -10,16 +10,11 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router/index'
-import store from './store/index'
-import VueAwesomeSwiper from 'vue-awesome-swiper'
-import 'swiper/dist/css/swiper.css'
 import './components'
 import 'amfe-flexible'
 import axios from './plugins/axios'
 import '@/icons' // icon
 import EventBus from './utils/eventBus'
-import VueClipboard from 'vue-clipboard2'
-import './utils/validator.js'
 
 import {
   Swipe,
@@ -67,10 +62,8 @@ import {
   Divider,
   Icon
 } from 'vant'
-Vue.use(VueAwesomeSwiper)
 Vue.use(axios)
 Vue.use(EventBus)
-Vue.use(VueClipboard)
 
 Vue.use(Tabbar).use(TabbarItem).use(Button).use(NavBar).use(Search).use(Icon).use(Picker).use(ActionSheet).use(Field).use(Cell).use(CellGroup)
   .use(Swipe).use(SwipeItem).use(Lazyload).use(GoodsAction).use(GoodsActionIcon).use(GoodsActionButton).use(Popup).use(Uploader).use(Dialog).use(Checkbox).use(CheckboxGroup)
@@ -81,6 +74,5 @@ Vue.config.productionTip = false
 
 new Vue({
   router,
-  store,
   render: h => h(App)
 }).$mount('#app')

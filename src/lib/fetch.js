@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { Message } from 'element-ui';
-import { DEFAULT_ERROR_MESSAGE } from '../config/index'
+import { DEFAULT_HTTP_URL,DEFAULT_ERROR_MESSAGE } from '../config/index'
 
 const instance = axios.create({
-    baseURL: 'http://localhost:8080/',
+    baseURL: DEFAULT_HTTP_URL,
     headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     }

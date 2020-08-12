@@ -35,10 +35,10 @@
           <svg-icon icon-class="pending-receipt"></svg-icon>
           <span>兑换历史</span>
         </li>
-        <router-link to="/order/refundAfterSale" class="order-item" tag="li">
+        <!--<router-link to="/order/refundAfterSale" class="order-item" tag="li">
           <svg-icon icon-class="all-orders"></svg-icon>
           <span>退换/售后</span>
-        </router-link>
+        </router-link>-->
       </ul>
     </section>
 
@@ -54,87 +54,14 @@
       </ul>
     </section>
 
-    <van-dialog
-      class="node-dialog"
-      v-model="show"
-      confirmButtonText="我知道啦"
-      close-on-click-overlay
-      confirmButtonColor="#3A3A3A"
-      confirm-button-color="#FCE14B"
-      :show-cancel-button="false"
-      :show-confirm-button="false"
-    >
-      <article>
-        <header class="dialog-header">
-          <img src="../../assets/image/product/header-good.png" />
-        </header>
-        <van-divider
-          :style="{ color: '#3A3A3A', borderColor: '#FFE31F',fontWeight:'600' ,fontSize:'14px', padding: '0 15px' }"
-        >我的节点数据</van-divider>
-        <ul class="my-node-data">
-          <li class="data-item">
-            <img
-              v-if="((userInfo.nodeType&1) === 1)"
-              src="../../assets/image/product/share-node-img.png"
-            />
-            <img v-else src="../../assets/image/product/gray-node-img.png" />
-            <span class="node-text">链猫掌柜</span>
-          </li>
-          <li class="data-item">
-            <img
-              v-if="((userInfo.nodeType&2) === 2)"
-              src="../../assets/image/product/area-node-img.png"
-            />
-            <img v-else src="../../assets/image/product/gray-node-img.png" />
-            <span class="node-text">区级节点</span>
-          </li>
-          <li class="data-item">
-            <img
-              v-if="((userInfo.nodeType&4) === 4)"
-              src="../../assets/image/product/municipal-node-img.png"
-            />
-            <img v-else src="../../assets/image/product/gray-node-img.png" />
-            <span class="node-text">市级节点</span>
-          </li>
-          <li class="data-item">
-            <img
-              v-if="((userInfo.nodeType&8) === 8)"
-              src="../../assets/image/product/state-node-img.png"
-            />
-            <img v-else src="../../assets/image/product/gray-node-img.png" />
-            <span class="node-text">州级节点</span>
-          </li>
-          <li class="data-item">
-            <img
-              v-if="((userInfo.nodeType&16) === 16)"
-              src="../../assets/image/product/industry-node-img.png"
-            />
-            <img v-else src="../../assets/image/product/gray-node-img.png" />
-            <span class="node-text">行业节点</span>
-          </li>
-          <li class="data-item">
-            <img
-              v-if="((userInfo.nodeType&32) === 32)"
-              src="../../assets/image/product/super-node-img.png"
-            />
-            <img v-else src="../../assets/image/product/gray-node-img.png" />
-            <span class="node-text">超级节点</span>
-          </li>
-        </ul>
-        <van-divider
-          :style="{ color: '#3A3A3A', borderColor: '#FFE31F',fontWeight:'600' ,fontSize:'14px', padding: '0 15px' }"
-        />
-        <div class="node-bottom">
-          <b class="know-btn" @click="handleClose">我知道啦</b>
-          <!-- <img class="gray-img" src="../../assets/image/product/gray-node-img.png" /> -->
-        </div>
-      </article>
-    </van-dialog>
     <tabbar></tabbar>
   </div>
 </template>
 
 <script>
+import fetch from '../../lib/fetch'
+import qs from 'qs'
+
 export default {
   name: 'mine',
   data () {
@@ -146,7 +73,7 @@ export default {
       userInfo: {},
       merchantsSettledStatus: null, // 商家入驻消息
       token: localStorage.token,
-      columns: 1
+      columns: 1,
     }
   },
   computed: {},
@@ -171,10 +98,10 @@ export default {
 
 <style scoped lang="scss">
 .mine-layout {
-  min-height: 812px;
+  min-height: 300px;
   padding-bottom: 50px;
-  .header-layout:after {
-    width: 140%;
+  /*.header-layout:after {
+    width: 100%;
     position: absolute;
     height: 218px;
     left: -20%;
@@ -183,10 +110,18 @@ export default {
     content: "";
     border-radius: 0 0 35% 35%;
     background: linear-gradient(#ec3924, #ff7428);
-  }
+  }*/
   .header-layout {
     padding: 30px 16px;
     height: 218px;
+    width: 100%;
+    /*position: absolute;*/
+    left: -20%;
+    top: 0;
+    z-index: -1;
+    content: "";
+    border-radius: 0 0 15% 15%;
+    background: linear-gradient(#ec3924, #ff7428);
     .mine-header {
       display: flex;
       padding-left: 24px;
