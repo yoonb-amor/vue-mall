@@ -74,12 +74,29 @@
       // this.initData()
       this.getPackageDetail()
       this.getAddress()
+      this.getAddressList();
     },
     methods: {
       goBack(){
         this.$router.push({
           path: `/index`,
         })
+      },
+      async getAddressList () {
+        if(this.$route.query.addressId){
+          return ;
+        }
+        let params = { userPhone: userPhone,accessToken:accessToken }
+        const res = await fetch(`/page/exchange/list`, qs.stringify(params))
+        if(!(res.code=="0000")){
+          return
+        }
+        for(let i=0;i<res.data.length;i++){
+          if(res.data[i].beDefault=='0'){
+            this.addressId=res.data[i].addressId;
+            this.addressData=res.data[i];
+          }
+        }
       },
       async getPackageDetail () {
         this.programId = this.$route.query.programId

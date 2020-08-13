@@ -7,7 +7,7 @@
     <section v-if="list60&&list60.byUnicomPrograms&&list60.byUnicomPrograms.length>0" class="spike-area spike-area-bg-1">
       <div class="spike-icon">
         <img src="../../assets/image/fj/icon1.png">
-        <span class="span1">价值60元礼包&nbsp;<span class="span2">(仅需50元, 就送60元超值礼包)</span></span>
+        <span class="span1 span11">价值60元礼包</span>
       </div>
       <section class="grid">
           <div v-for="(item,index) in list60.byUnicomPrograms" :key="index" class="product bg-color-1">
@@ -23,7 +23,7 @@
     <section v-if="list120&&list120.byUnicomPrograms&&list120.byUnicomPrograms.length>0" class="spike-area spike-area-bg-2">
       <div class="spike-icon">
         <img src="../../assets/image/fj/icon2.png">
-        <span class="span1">价值120元礼包&nbsp;<span class="span2">(仅需100元, 就送120元超值礼包)</span></span>
+        <span class="span1">价值120元礼包</span>
       </div>
       <section class="grid">
         <div v-for="(item,index) in list120.byUnicomPrograms" :key="index" class="product bg-color-2">
@@ -39,7 +39,7 @@
     <section v-if="list200&&list200.byUnicomPrograms&&list200.byUnicomPrograms.length>0" class="spike-area spike-area-bg-3">
       <div class="spike-icon">
         <img src="../../assets/image/fj/icon3.png">
-        <span class="span1">价值200元礼包&nbsp;<span class="span2">(仅需180元, 就送200元超值礼包)</span></span>
+        <span class="span1">价值200元礼包</span>
       </div>
       <section class="grid">
         <div v-for="(item,index) in list200.byUnicomPrograms" :key="index" class="product bg-color-3">
@@ -55,7 +55,7 @@
     <section v-if="list300&&list300.byUnicomPrograms&&list300.byUnicomPrograms.length>0" class="spike-area spike-area-bg-4">
       <div class="spike-icon">
         <img src="../../assets/image/fj/icon4.png">
-        <span class="span1">价值300元礼包&nbsp;<span class="span2">(仅需280元, 就送300元超值礼包)</span></span>
+        <span class="span1">价值300元礼包</span>
       </div>
       <section class="grid">
         <div v-for="(item,index) in list300.byUnicomPrograms" :key="index" class="product bg-color-4">
@@ -201,9 +201,9 @@
         .span1 {
           font-size: 18px;
           color: #ffffff;
-          .span2 {
-            font-size: 12px;
-          }
+        }
+        .span11{
+          color: #8d5e06;
         }
       }
 
@@ -257,7 +257,7 @@
               display: block;
               margin: 0 auto;
               max-width: 80px;
-              max-height: 70px;
+              max-height: 100px;
               -webkit-transform-origin: 50% 100%;
               transform-origin: 50% 100%;
             }

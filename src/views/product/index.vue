@@ -333,8 +333,6 @@ export default {
       position: relative;
       min-width: 375px;
       height: 50px;
-      background: url("../../assets/image/product/rectangle-left.png") no-repeat
-        left center;
       background-size: 76% 100%;
       z-index: 2;
       padding: 6px 16px;
@@ -382,8 +380,6 @@ export default {
       right: 0;
       width: 100%;
       height: 50px;
-      background: url("../../assets/image/product/rectangle-right.png")
-        no-repeat right center;
       background-size: 32% 100%;
       padding-right: 16px 20px;
       .right-content {

@@ -156,8 +156,6 @@ export default {
             height: 25px;
             font-size: 11px;
             text-align: center;
-            background: url("../../assets/image/product/sharing-node.png")
-              no-repeat center center;
             background-size: 100% 100%;
             border-radius: 11px 11px;
           }
