@@ -61,5 +61,8 @@
     .product-img {
       max-width: 100%;
     }
+    .product-img:nth-child(n+1){
+      margin-top: -10px;
+    }
   }
 </style>
