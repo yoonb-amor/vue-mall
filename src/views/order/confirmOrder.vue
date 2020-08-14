@@ -15,14 +15,14 @@
               <svg-icon icon-class="shipping-address"></svg-icon>
               <span class="address-userName">{{addressData.consignee}}</span>
               <span class="address-userPhone">{{addressData.phone}}</span>
-              <span class="address-address" >{{addressData.allAreaName}}-{{addressData.streetAddress}}</span>
+              <span class="address-address">{{addressData.allAreaName}}-{{addressData.streetAddress}}</span>
             </div>
             <span class="address-fullAddress" v-else>请选择收货人地址</span>
           </div>
           <svg-icon class="arrow-icon-right" icon-class="arrow-icon-right"></svg-icon>
         </li>
       </ul>
-      </section>
+    </section>
 
     <section class="order-card" v-if="packageDetail!=null">
       <div class="product bg-color-2">
@@ -30,7 +30,7 @@
         <div class="product__info">
           <span class="product__info_name">{{packageDetail.packageType}}</span>
           <span v-for="(item,index) in packageDetail.byUnicomPrograms[0].byUnicomCommodities">
-            <span>{{item.jdProductName}}</span>
+            <p class="p"><span @click="showDetail(item.jdSku)">{{index+1}}、{{item.jdProductName}}</span></p>
           </span>
         </div>
         <div class="pay-count">
@@ -59,11 +59,11 @@
     name: 'ConfirmOrder',
     data () {
       return {
-        DEFAULT_HTTP_URL:DEFAULT_HTTP_URL,
+        DEFAULT_HTTP_URL: DEFAULT_HTTP_URL,
         programId: '',
-        addressId:'',
-        addressData:{},
-        packageDetail:{},
+        addressId: '',
+        addressData: {},
+        packageDetail: {},
         orderForm: {},
         columns: 1,
         orderNo: '',
@@ -74,62 +74,75 @@
       // this.initData()
       this.getPackageDetail()
       this.getAddress()
-      this.getAddressList();
+      this.getAddressList()
     },
     methods: {
-      goBack(){
+      goBack () {
         this.$router.push({
           path: `/index`,
         })
       },
+      showDetail (jdSku) {
+        this.$router.push({
+          path: `/product/detail`,
+          query: {
+            jdSku: jdSku,
+            programId: this.$route.query.programId,
+            addressId: this.$route.query.addressId
+          }
+        })
+      },
       async getAddressList () {
-        if(this.$route.query.addressId){
-          return ;
-        }
-        let params = { userPhone: userPhone,accessToken:accessToken }
-        const res = await fetch(`/page/exchange/list`, qs.stringify(params))
-        if(!(res.code=="0000")){
+        if (this.$route.query.addressId) {
           return
         }
-        for(let i=0;i<res.data.length;i++){
-          if(res.data[i].beDefault=='0'){
-            this.addressId=res.data[i].addressId;
-            this.addressData=res.data[i];
+        let params = { userPhone: userPhone, accessToken: accessToken }
+        const res = await fetch(`/page/exchange/list`, qs.stringify(params))
+        if (!(res.code == '0000')) {
+          return
+        }
+        for (let i = 0; i < res.data.length; i++) {
+          if (res.data[i].beDefault == '0') {
+            this.addressId = res.data[i].addressId
+            this.addressData = res.data[i]
           }
         }
       },
       async getPackageDetail () {
         this.programId = this.$route.query.programId
-        let params = { programId: this.programId,
-          userPhone:userPhone,
-          accessToken:accessToken
+        let params = {
+          programId: this.programId,
+          userPhone: userPhone,
+          accessToken: accessToken
         }
         const res = await fetch(`/page/exchange/packageDetails`, qs.stringify(params))
-        if(!(res.code=="0000")){
+        if (!(res.code == '0000')) {
           this.$toast({
             mask: false,
             message: res.message
           })
           return
         }
-        this.packageDetail=res.data;
+        this.packageDetail = res.data
       },
-      async getAddress(){
-        if(!this.$route.query.addressId){
-          return ;
+      async getAddress () {
+        if (!this.$route.query.addressId) {
+          return
         }
         this.addressId = this.$route.query.addressId
-        let params = { addressId: this.addressId,
-          userPhone:userPhone,accessToken:accessToken}
+        let params = {
+          addressId: this.addressId,
+          userPhone: userPhone, accessToken: accessToken
+        }
         const res = await fetch(`/page/exchange/detail`, qs.stringify(params))
-        if(!(res.code=="0000")){
+        if (!(res.code == '0000')) {
           this.$toast({
             mask: false,
             message: res.message
           })
           return
         }
-        this.addressData=res.data;
+        this.addressData = res.data
       },
       async handleSubmitOrder () {
         if (!this.$route.query.addressId) {
@@ -147,14 +160,14 @@
           loadingType: 'spinner',
           message: '订单提交中...'
         })
-        const params={};
-        params.userPhone=userPhone;
-        params.accessToken=accessToken;
-        params.programId=this.$route.query.programId;
-        params.addressId=this.$route.query.addressId;
-        params.exchangeType=exchangeType;
-        const res= await fetch(`/page/exchange/settlementExchange`,qs.stringify(params))
-        if(!(res.code=="0000")){
+        const params = {}
+        params.userPhone = userPhone
+        params.accessToken = accessToken
+        params.programId = this.$route.query.programId
+        params.addressId = this.$route.query.addressId
+        params.exchangeType = exchangeType
+        const res = await fetch(`/page/exchange/settlementExchange`, qs.stringify(params))
+        if (!(res.code == '0000')) {
           this.$toast({
             mask: false,
             message: res.message
@@ -162,11 +175,11 @@
           return
         }
 
-        const orderNumber=res.data;
+        const orderNumber = res.data
         this.$router.push({
           path: `/order/orderDetail`,
           query: {
-            orderNumber:orderNumber,
+            orderNumber: orderNumber,
           }
         })
       },
@@ -174,7 +187,7 @@
         this.$router.push({
           path: `/order/chooseAddress`,
           query: {
-            programId:this.$route.query.programId,
+            programId: this.$route.query.programId,
           }
         })
       }
@@ -193,22 +206,30 @@
       padding: 10px 20px;
       margin-top: 20px;
 
-      .product{
+      .product {
         width: 100%;
         overflow: auto;
         max-height: 400px;
-        .product__image{
+
+        .product__image {
           width: 100%;
           display: block;
         }
-        .product__info{
-            width: 100%;
-          .product__info_name{
+
+        .product__info {
+          width: 100%;
+
+          .product__info_name {
             color: #9b9b9b;
             font-size: 14px;
             display: block;
           }
+          .p{
+            line-height: 30px;
+            text-decoration: underline;
+          }
         }
+
         .pay-count {
           display: flex;
           justify-content: space-between;
@@ -220,7 +241,8 @@
             font-weight: 700;
           }
         }
-        span{
+
+        span {
           font-size: 16px;
           display: block;
         }
@@ -334,6 +356,7 @@
 
       .info-list {
         color: #3a3a3a;
+
         .info-title {
           display: flex;
           font-weight: 600;
@@ -363,9 +386,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            .address-div{
+
+            .address-div {
               max-height: 70px;
             }
+
             .address-userName {
               font-size: 13px;
               font-weight: bold;
@@ -376,6 +401,7 @@
               top: 80px;
               left: 60px;
             }
+
             .address-userPhone {
               font-size: 13px;
               font-weight: bold;
@@ -386,7 +412,8 @@
               top: 80px;
               left: 160px;
             }
-            .address-address{
+
+            .address-address {
               font-size: 13px;
               font-weight: bold;
               padding-left: 10px;
@@ -399,6 +426,7 @@
               text-overflow: ellipsis;
               white-space: nowrap;
             }
+
             .address-fullAddress {
               font-size: 13px;
               font-weight: bold;
